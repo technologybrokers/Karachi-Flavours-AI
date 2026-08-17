@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Food AI Agent Admin</title>
+  <link rel="stylesheet" href="/admin.css" />
+</head>
+<body>
+  <header>
+    <div>
+      <h1 id="businessTitle">Food AI Agent</h1>
+      <p>Live menu, stock and orders</p>
+    </div>
+    <div class="header-actions">
+      <input id="datePicker" type="date" />
+      <button id="refreshBtn">Refresh</button>
+      <button id="tokenBtn" class="secondary">Admin token</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats" id="stats"></section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div><h2>Menu & Stock</h2><p>The AI reads these quantities live.</p></div>
+        <button id="addItemBtn">+ Add dish</button>
+      </div>
+      <div class="table-wrap"><table id="menuTable">
+        <thead><tr><th>Dish</th><th>Price</th><th>Size</th><th>Prepared</th><th>Reserved</th><th>Sold</th><th>Available</th><th>Status</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><h2>Orders</h2><p>Confirmed WhatsApp orders for the selected pickup date.</p></div></div>
+      <div class="table-wrap"><table id="ordersTable">
+        <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Pickup</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><h2>Business Settings</h2><p>Only verified information here is given to customers.</p></div></div>
+      <form id="settingsForm" class="form-grid">
+        <label>Business name<input name="business_name" /></label>
+        <label>Display phone<input name="phone_display" /></label>
+        <label class="wide">Pickup address<input name="pickup_address" /></label>
+        <label>Default pickup start<input name="default_pickup_start" type="time" /></label>
+        <label>Default pickup end<input name="default_pickup_end" type="time" /></label>
+        <label class="wide">Pickup instructions<textarea name="pickup_instructions"></textarea></label>
+        <label class="wide">Payment instructions<textarea name="payment_instructions"></textarea></label>
+        <label class="wide">Business notes<textarea name="business_notes" placeholder="e.g. Pickup only. No delivery. Prices are fixed."></textarea></label>
+        <div class="wide"><button type="submit">Save settings</button></div>
+      </form>
+    </section>
+  </main>
+
+  <dialog id="itemDialog">
+    <form id="itemForm" method="dialog" class="dialog-form">
+      <h2>Add dish</h2>
+      <input type="hidden" name="service_date" />
+      <label>Dish name<input name="item_name" required /></label>
+      <label>Price ($)<input name="price" type="number" min="0" step="0.01" required /></label>
+      <label>Portion / box size<input name="portion_size" placeholder="750 ml box" /></label>
+      <label>Quantity prepared<input name="prepared_qty" type="number" min="0" step="1" required value="0" /></label>
+      <label>Pickup start<input name="pickup_start" type="time" /></label>
+      <label>Pickup end<input name="pickup_end" type="time" /></label>
+      <label>Allergens<input name="allergens" placeholder="Only enter verified information" /></label>
+      <label>Dietary notes<input name="dietary_notes" /></label>
+      <label class="wide">Description<textarea name="description"></textarea></label>
+      <div class="dialog-actions"><button type="button" id="cancelItemBtn" class="secondary">Cancel</button><button type="submit">Add</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast"></div>
+  <script src="/admin.js" type="module"></script>
+</body>
+</html>

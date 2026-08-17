@@ -1,0 +1,23 @@
+{
+  "name": "food-whatsapp-ai-agent",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Autonomous WhatsApp ordering agent for a small food business using Twilio WhatsApp, OpenAI Responses API and Supabase.",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "check": "node --check src/server.js && node --check src/config.js && node --check src/db.js && node --check src/whatsapp.js && node --check src/tools.js && node --check src/agent.js && node --check src/worker.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "luxon": "latest",
+    "openai": "latest",
+    "twilio": "6.0.2"
+  }
+}
