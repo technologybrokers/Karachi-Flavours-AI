@@ -1,8 +1,6 @@
 import twilio from 'twilio';
 import { config } from './config.js';
 
-const client = config.dryRunWhatsApp ? null : twilio(config.twilioAccountSid, config.twilioAuthToken);
-
 function stripWhatsAppPrefix(value = '') {
   return String(value).replace(/^whatsapp:/i, '');
 }
@@ -45,17 +43,47 @@ export function extractInboundMessage(params = {}) {
   };
 }
 
+// Send directly to Twilio's Messages REST endpoint rather than via the helper
+// library's Message builder. This deliberately sends only Body, From and To
+// for an in-session WhatsApp free-form reply.
 export async function sendWhatsAppText(to, body) {
   if (config.dryRunWhatsApp) {
     console.log(`[DRY RUN WhatsApp -> ${to}] ${body}`);
     return { id: `dry-${Date.now()}` };
   }
 
-  const message = await client.messages.create({
-    body,
-    from: asWhatsAppAddress(config.twilioWhatsAppFrom),
-    to: asWhatsAppAddress(to),
+  const fromAddress = asWhatsAppAddress(config.twilioWhatsAppFrom);
+  const toAddress = asWhatsAppAddress(to);
+  const form = new URLSearchParams();
+  form.set('Body', String(body));
+  form.set('From', fromAddress);
+  form.set('To', toAddress);
+
+  const auth = Buffer.from(`${config.twilioAccountSid}:${config.twilioAuthToken}`).toString('base64');
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(config.twilioAccountSid)}/Messages.json`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
+    },
+    body: form.toString(),
   });
 
-  return { id: message.sid, status: message.status };
+  const raw = await response.text();
+  let data = {};
+  try { data = raw ? JSON.parse(raw) : {}; }
+  catch { data = { message: raw }; }
+
+  if (!response.ok) {
+    const error = new Error(`Twilio send failed (${response.status})${data.code ? ` code ${data.code}` : ''}: ${data.message || response.statusText}`);
+    error.status = response.status;
+    error.code = data.code;
+    error.moreInfo = data.more_info || data.moreInfo;
+    throw error;
+  }
+
+  return { id: data.sid, status: data.status };
 }
