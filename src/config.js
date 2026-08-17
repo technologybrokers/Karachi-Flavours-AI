@@ -1,6 +1,8 @@
 import 'dotenv/config';
 
 const dryRunWhatsApp = String(process.env.DRY_RUN_WHATSAPP || 'false').toLowerCase() === 'true';
+const twilioReplyMode = String(process.env.TWILIO_REPLY_MODE || 'twiml').toLowerCase();
+if (!['twiml', 'rest'].includes(twilioReplyMode)) throw new Error('TWILIO_REPLY_MODE must be twiml or rest');
 
 function required(name, fallback = undefined) {
   const value = process.env[name] ?? fallback;
@@ -27,6 +29,7 @@ export const config = {
   openaiModel: process.env.OPENAI_MODEL || 'gpt-5.6-terra',
 
   dryRunWhatsApp,
+  twilioReplyMode,
   twilioAccountSid: process.env.TWILIO_ACCOUNT_SID || (dryRunWhatsApp ? 'AC-dry-run' : required('TWILIO_ACCOUNT_SID')),
   twilioAuthToken: process.env.TWILIO_AUTH_TOKEN || (dryRunWhatsApp ? 'dry-run' : required('TWILIO_AUTH_TOKEN')),
   twilioWhatsAppFrom: process.env.TWILIO_WHATSAPP_FROM || (dryRunWhatsApp ? 'whatsapp:+10000000000' : required('TWILIO_WHATSAPP_FROM')),

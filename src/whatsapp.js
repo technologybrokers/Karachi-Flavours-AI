@@ -17,6 +17,13 @@ export function verifyTwilioSignature(signatureHeader, params) {
   return twilio.validateRequest(config.twilioAuthToken, signatureHeader, webhookUrl, params || {});
 }
 
+
+export function buildTwiMLReply(body = '') {
+  const response = new twilio.twiml.MessagingResponse();
+  if (String(body).trim()) response.message(String(body));
+  return response.toString();
+}
+
 export function extractInboundMessage(params = {}) {
   const messageSid = params.MessageSid || params.SmsMessageSid || params.SmsSid;
   const from = stripWhatsAppPrefix(params.From || '');
